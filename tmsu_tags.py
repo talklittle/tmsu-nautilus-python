@@ -2,7 +2,6 @@ import gi
 gi.require_version('Nautilus', '3.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Nautilus, GObject, Gtk, Gdk
-import os
 import subprocess
 import urllib
 
@@ -11,10 +10,10 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
         pass
 
     def get_columns(self):
-        return Nautilus.Column(name="NautilusPython::block_size_column",
-                               attribute="block_size",
-                               label="Block size",
-                               description="Get the block size"),
+        return Nautilus.Column(name="TmsuTagsExtension::tmsu_tags_column",
+                               attribute="tmsu_tags",
+                               label="TMSU tags",
+                               description="List of TMSU tags"),
 
     def update_file_info(self, file):
         if file.get_uri_scheme() != 'file':
@@ -22,7 +21,15 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
 
         filename = urllib.unquote(file.get_uri()[7:])
 
-        file.add_string_attribute('block_size', str(os.stat(filename).st_blksize))
+        try:
+            result = subprocess.check_output(['tmsu', 'tags', filename]).strip()
+            idx = result.find(': ')
+            if idx >= 0:
+                file.add_string_attribute('tmsu_tags', result[(idx+2):])
+            else:
+                file.add_string_attribute('tmsu_tags', '')
+        except subprocess.CalledProcessError as e:
+            pass
 
     def get_file_items(self, window, files):
         top_menuitem = Nautilus.MenuItem(name='TmsuTagsExtension::TMSU',
