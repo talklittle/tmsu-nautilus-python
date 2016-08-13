@@ -1,3 +1,8 @@
+#
+# tmsu_tags.py
+# version 0.1.0
+#
+
 import gi
 gi.require_version('Nautilus', '3.0')
 gi.require_version('Gtk', '3.0')

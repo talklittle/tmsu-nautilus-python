@@ -12,6 +12,10 @@ GNOME Nautilus extension for file tagging using [TMSU](https://github.com/oniony
 
 **TODO**
 
+## Release notes
+
+See [CHANGELOG.md](CHANGELOG.md) for changes between versions.
+
 ## License
 
 [GNU General Public License version 3](COPYING.txt)
