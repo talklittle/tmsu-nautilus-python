@@ -3,6 +3,7 @@ gi.require_version('Nautilus', '3.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Nautilus, GObject, Gtk, Gdk
 import os
+import subprocess
 import urllib
 
 class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoProvider, Nautilus.MenuProvider):
@@ -47,6 +48,8 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
 
 class AddTagsWindow(Gtk.Window):
     def __init__(self, files):
+        self.files = files
+
         Gtk.Window.__init__(self, title="TMSU")
         self.set_size_request(200, 100)
         self.set_border_width(10)
@@ -75,4 +78,23 @@ class AddTagsWindow(Gtk.Window):
 
     def add_tags(self):
         tags = self.entry.get_text()
-        print(tags)
+        try:
+            subprocess.check_call(['tmsu', 'tag', '--tags={}'.format(tags)] + self.filenames())
+
+            # TODO notify change
+
+            self.close()
+        except subprocess.CalledProcessError as e:
+            # TODO display error dialog
+            print(e)
+
+    def filenames(self):
+        filenames = []
+
+        for file in self.files:
+            if file.get_uri_scheme() != 'file':
+                continue
+            filename = urllib.unquote(file.get_uri()[7:])
+            filenames.append(filename)
+
+        return filenames
