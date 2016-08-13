@@ -10,7 +10,17 @@ GNOME Nautilus extension for file tagging using [TMSU](https://github.com/oniony
 
 ## Installation
 
-**TODO**
+Create the nautilus-python extensions directory:
+
+    mkdir -p ~/.local/share/nautilus-python/extensions
+
+Copy (or symlink) `tmsu_tags.py` into the extensions directory:
+
+    cp tmsu_tags.py ~/.local/share/nautilus-python/extensions/tmsu_tags.py
+
+Kill and restart Nautilus:
+
+    nautilus -q
 
 ## Release notes
 
