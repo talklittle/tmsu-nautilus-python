@@ -13,7 +13,7 @@ import urllib
 
 class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoProvider, Nautilus.MenuProvider):
     def __init__(self):
-        pass
+        self.procs = {}
 
     def get_columns(self):
         return Nautilus.Column(name="TmsuTagsExtension::tmsu_tags_column",
@@ -21,21 +21,45 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
                                label="TMSU tags",
                                description="List of TMSU tags"),
 
-    def update_file_info(self, file):
+    def update_file_info_full(self, provider, handle, closure, file):
         if file.get_uri_scheme() != 'file':
             return
-
         filename = urllib.unquote(file.get_uri()[7:])
 
-        try:
-            result = subprocess.check_output(['tmsu', 'tags', filename], cwd=os.path.dirname(filename)).strip()
-            idx = result.find(': ')
-            if idx >= 0:
-                file.add_string_attribute('tmsu_tags', result[(idx+2):])
+        self.procs[handle] = subprocess.Popen(['tmsu', 'tags', filename], stdout=subprocess.PIPE, cwd=os.path.dirname(filename))
+        GObject.timeout_add_seconds(0.1, self.update_file_info_timer_cb, provider, handle, closure, file)
+
+        return Nautilus.OperationResult.IN_PROGRESS
+
+    def update_file_info_timer_cb(self, provider, handle, closure, file):
+        if handle is None or handle not in self.procs:
+            return False
+        proc = self.procs[handle]
+
+        retcode = proc.poll()
+        if retcode is not None:
+            if retcode == 0:
+                result, errs = proc.communicate()
+                result = result.strip()
+                print('result=%s' % result)
+                idx = result.find(': ')
+                if idx >= 0:
+                    file.add_string_attribute('tmsu_tags', result[(idx+2):])
+                else:
+                    file.add_string_attribute('tmsu_tags', '')
+                Nautilus.info_provider_update_complete_invoke(closure, provider, handle, Nautilus.OperationResult.COMPLETE)
             else:
-                file.add_string_attribute('tmsu_tags', '')
-        except subprocess.CalledProcessError as e:
-            pass
+                Nautilus.info_provider_update_complete_invoke(closure, provider, handle, Nautilus.OperationResult.FAILED)
+            del self.procs[handle]
+            return False
+        else:
+            # retry
+            return True
+
+    def cancel_update(self, provider, handle):
+        if handle in self.procs:
+            self.procs[handle].kill()
+            del self.procs[handle]
 
     def get_file_items(self, window, files):
         top_menuitem = Nautilus.MenuItem(name='TmsuTagsExtension::TMSU',
