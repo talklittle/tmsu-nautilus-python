@@ -23,11 +23,11 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
 
     def update_file_info_full(self, provider, handle, closure, file):
         if file.get_uri_scheme() != 'file':
-            return
+            return Nautilus.OperationResult.COMPLETE
         filename = urllib.unquote(file.get_uri()[7:])
 
         self.procs[handle] = subprocess.Popen(['tmsu', 'tags', filename], stdout=subprocess.PIPE, cwd=os.path.dirname(filename))
-        GObject.timeout_add_seconds(0.1, self.update_file_info_timer_cb, provider, handle, closure, file)
+        GObject.timeout_add(50, self.update_file_info_timer_cb, provider, handle, closure, file)
 
         return Nautilus.OperationResult.IN_PROGRESS
 
