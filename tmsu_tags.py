@@ -7,6 +7,7 @@ import gi
 gi.require_version('Nautilus', '3.0')
 gi.require_version('Gtk', '3.0')
 from gi.repository import Nautilus, GObject, Gtk, Gdk
+import os
 import subprocess
 import urllib
 
@@ -27,7 +28,7 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
         filename = urllib.unquote(file.get_uri()[7:])
 
         try:
-            result = subprocess.check_output(['tmsu', 'tags', filename]).strip()
+            result = subprocess.check_output(['tmsu', 'tags', filename], cwd=os.path.dirname(filename)).strip()
             idx = result.find(': ')
             if idx >= 0:
                 file.add_string_attribute('tmsu_tags', result[(idx+2):])
