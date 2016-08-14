@@ -51,6 +51,7 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
             else:
                 Nautilus.info_provider_update_complete_invoke(closure, provider, handle, Nautilus.OperationResult.FAILED)
             del self.procs[handle]
+            file.invalidate_extension_info()
             return False
         else:
             # retry
