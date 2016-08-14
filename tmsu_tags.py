@@ -95,8 +95,9 @@ class AddTagsWindow(Gtk.Window):
 
     def add_tags(self):
         tags = self.entry.get_text()
+        filenames = self.filenames()
         try:
-            subprocess.check_call(['tmsu', 'tag', '--tags={}'.format(tags)] + self.filenames())
+            subprocess.check_call(['tmsu', 'tag', '--tags={}'.format(tags)] + filenames, cwd=os.path.dirname(filenames[0]))
 
             # TODO notify change
 
