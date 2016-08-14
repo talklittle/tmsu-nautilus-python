@@ -52,6 +52,10 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
 
         return top_menuitem,
 
+    def get_background_items(self, window, files):
+        # TODO tmsu init
+        return ()
+
     def add_tag_activate_cb(self, menu, files):
         win = AddTagsWindow(files)
         win.connect("delete-event", Gtk.main_quit)
