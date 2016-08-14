@@ -99,7 +99,8 @@ class AddTagsWindow(Gtk.Window):
         try:
             subprocess.check_call(['tmsu', 'tag', '--tags={}'.format(tags)] + filenames, cwd=os.path.dirname(filenames[0]))
 
-            # TODO notify change
+            for file in self.files:
+                file.invalidate_extension_info()
 
             self.close()
         except subprocess.CalledProcessError as e:
