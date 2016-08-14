@@ -46,8 +46,8 @@ class TmsuTagsExtension(GObject.GObject, Nautilus.ColumnProvider, Nautilus.InfoP
         top_menuitem.set_submenu(submenu)
 
         add_tag_menuitem = Nautilus.MenuItem(name='TmsuTagsExtension::Add_Tag',
-                                             label='Add tags',
-                                             tip='Add tags')
+                                             label=u'Add tags\u2026',
+                                             tip=u'Add tags\u2026')
         add_tag_menuitem.connect('activate', self.add_tag_activate_cb, files)
         submenu.append_item(add_tag_menuitem)
 
