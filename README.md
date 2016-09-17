@@ -1,3 +1,7 @@
+# Obsolete
+
+Superseded by [Rust version](https://github.com/talklittle/tmsu-nautilus-rs) which is faster and less buggy.
+
 # TMSU Nautilus Extension
 
 GNOME Nautilus extension for file tagging using [TMSU](https://github.com/oniony/TMSU/).
